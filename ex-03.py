@@ -2,10 +2,32 @@
 Contour Fill on Maps, Pedram. 
 """
 
+#-- no output? check if the last line that contains
+#-- the plot function is commented. uncomment for output.
+
 import numpy as np
 import Ngl as ngl
 import Nio as nio
 from datetime import date, timedelta
+
+def pedplot():
+	#-- create the contour plot
+	plot = ngl.contour_map(wks,var,res)
+
+	#-- write variable long name and units to the plot
+	txres   = ngl.Resources()
+	txres.txFontHeightF = 0.012
+
+	ngl.text_ndc(wks, plotname + \
+						'   In degrees Celsius.' + \
+						'   Data date: ' + str(t_date) , \
+						0.50,0.82,txres)
+			# Hard coded this because of inconsistency \
+			# in data structure: f.variables['skt'].attributes['units']
+
+	#-- advance the frame
+	
+	ngl.frame(wks)
 
 #-- open file and read variables 
 
@@ -93,22 +115,8 @@ for i in range(frames):
 	plotname = f.variables['skt'].attributes['long_name'] + \
 		' by Pedram, for Dear Saeed.'
 	
-	#-- create the contour plot
-	plot = ngl.contour_map(wks,var,res)
-
-	#-- write variable long name and units to the plot
-	txres   = ngl.Resources()
-	txres.txFontHeightF = 0.012
-
-	ngl.text_ndc(wks, plotname + \
-						'   In degrees Celsius.' + \
-						'   Data date: ' + str(t_date) , \
-						0.50,0.82,txres)
-			# Hard coded this because of inconsistency \
-			# in data structure: f.variables['skt'].attributes['units']
-
-	#-- advance the frame
 	
-	ngl.frame(wks)
-
+	
+	# == comment or uncomment next line to get the map outputs == #
+	#pedplot()
 	ngl.end()
