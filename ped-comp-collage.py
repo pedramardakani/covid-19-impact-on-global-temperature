@@ -24,25 +24,38 @@ def gettime(index):
     hrs = f.variables['time'][index]
     res = h2d(hrs)
     return res
+
+#-- get the difference between two dates
+#-- pay attention to argument placements
+def getdiff(t_f,t_i):
+    # check if available (later)
+    return f.variables['skt'][t_f,0,:,:] - f.variables['skt'][t_i,0,:,:]
+
 # === set variables  === #
 
 #-- set filename to read the data from
 filename = "data-comp.nc"
-plotname = "test"
+plotname = "collage"
 plottype = "png"
 db = False # set debugging mode on or off
 
 # === start calculations  === #
 
-#-- open file and dicover variables
+#-- open file
 f   = nio.open_file(filename,'r')
 
-#-- check how many datasets are available under different times
-print(np.size(f.variables['time'].attributes['calendar']))
-print(f.variables['time'].attributes['calendar'])
-print(f.variables['time'])
-for i in f.variables['time']:
-    print('i =',i,'Date:',h2d(i))
+#-- start the graphics
+wks = ngl.open_wks(plottype,plotname)
+
+#-- resource settings
+res = ngl.Resources()
+res.nglFrame        = False
+res.cnFillOn        = True
+res.cnFillPalette   = "NCL_default"
+res.cnLineLabelsOn  = False
+res.lbOrientation   = "horizontal"
+res.sfXArray        = lon
+res.sfYArray        = lat
 
 #-- converting time, hours since 1900-01-01
 t_f = 6 # time index, from zero to
@@ -56,8 +69,7 @@ if db:
         for at in f.variables[vt].attributes:
             print("f.variables['",vt,"'].attributes['",at,"']",sep='')
 
-
-var = f.variables['skt'][t_f,0,:,:] - f.variables['skt'][t_i,0,:,:]
+var = getdiff(t_f,t_i)
 lat = f.variables['latitude'][:]
 lon = f.variables['longitude'][:]
 
@@ -66,18 +78,15 @@ if db:
     print('** lat size:', np.size(lat))
     print('** lon size:', np.size(lon))
 
-#-- resource settings
-res = ngl.Resources()
-res.nglFrame        = False
-res.cnFillOn        = True
-res.cnFillPalette   = "NCL_default"
-res.cnLineLabelsOn  = False
-res.lbOrientation   = "horizontal"
-res.sfXArray        = lon
-res.sfYArray        = lat
-wks = ngl.open_wks(plottype,plotname)
 
 if db : print('** converting time:',hrs,'to Date:', gettime(t_i))
+
+#-- check how many datasets are available under different times
+print(np.size(f.variables['time'].attributes['calendar']))
+print(f.variables['time'].attributes['calendar'])
+print(f.variables['time'])
+for i in f.variables['time']:
+    print('i =',i,'Date:',h2d(i))
 
 #-- Check the data type, if it's anything other than float64, numpy will complain
 if(var.dtype != 'float64'):
