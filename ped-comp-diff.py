@@ -27,8 +27,8 @@ def gettime(index):
 # === set variables  === #
 
 #-- set filename to read the data from
-filename = "data-comp.nc"
-plotname = "test"
+filename = "data-comp-1.nc"
+plotname = "test-1"
 plottype = "png"
 db = False # set debugging mode on or off
 
@@ -45,8 +45,8 @@ for i in f.variables['time']:
     print('i =',i,'Date:',h2d(i))
 
 #-- converting time, hours since 1900-01-01
-t_f = 6 # time index, from zero to
-t_i = 3 # difference
+t_f = 0 # time index, from zero to
+t_i = 0 # difference
 plotname = plotname + str(gettime(t_f)) + " vs " + str(gettime(t_i))
 
 if db:

@@ -22,7 +22,7 @@ def h2d(hrs):
 # === set variables  === #
 
 #-- set filename to read the data from
-filename = "data-comp.nc"
+filename = "data-comp-2.nc"
 plotname = "test"
 plottype = "png"
 db = False # set debugging mode on or off
