@@ -1,14 +1,18 @@
 """
 Contour Fill on Maps, Pedram.
+
+Trying to make this code a modular one, in order to plot files easier.
 """
 
 #-- define a tic, toc function to check performance
-#-- no output? check if the last line that contains the plot function is commented. uncomment for output.
+#-- no output? check if the last line that contains the plot function
+# is commented. uncomment for output.
 
 import numpy as np
 import Ngl as ngl
 import Nio as nio
 import datetime
+from sys import argv as av # get input right on the command line
 
 # === define functions === #
 
@@ -19,13 +23,56 @@ def h2d(hrs):
     res = tstart + tdelta
     return res
 
+#-- get time straight from data table
+def gettime(index):
+    hrs = f.variables['time'][index]
+    res = h2d(hrs)
+    return res
+
+#-- convert data to float64 for numpy compatiblility
+# and get the product from scale factor
+def getdata(time):
+    # Fetch the data based on the data-set architecture
+    var = f.variables['skt'][time,0,0,:,:]
+    # Change to float64
+    var = var.astype('float64')
+    # Check scale
+    sf = f.variables['skt'].attributes['scale_factor']
+    # Apply the scale
+    var = var * np.array(sf)
+    return var
+
+#-- get the difference between two dates. Pay attention to argument
+# orders. Subtract the final from the initial. Hence, the result shows
+# how much the temperature has changed since the initial value.
+def getdiff(t_f,t_i):
+    # check if available (later)
+    return getdata(t_f) - getdata(t_i)
+
 # === set variables  === #
 
-#-- set filename to read the data from
-filename = "data-comp.nc"
+#-- Set filename to read the data from. Get the name from system input
+# if it is provided in the command line. This could be understood from
+# numbers of arguments passed to Python while running this script, i.e.
+# `$ python ped-comp.py dataset-name data-to-plot`
+#-- For example, the code below, plots the first data in the file named
+# `data-comp.nc` in the current working directory:
+# `$ python ped-comp.py data-comp.nc 0`
+#filename = "data-comp.nc"
+#-- Get the initial time from user input if it is available. Otherwise,
+# just use the default `0` value for time index: t_i.
+# Be advised, the argument has to be only one integer. Also, this value
+# is not allowed to be larger than `time` tables available.
+if(np.size(av) > 2):
+    filename = str(av[1])
+    t_i = int(av[2])
+else:
+    filename = "data-2020.nc"
+    t_i = 0
+
 plotname = "test"
 plottype = "png"
-db = True # set debugging mode on or off
+db = False # set debugging mode on or off
 
 # === start calculations  === #
 
@@ -59,20 +106,27 @@ if db:
 print(np.size(f.variables['time'].attributes['calendar']))
 print(f.variables['time'].attributes['calendar'])
 print(f.variables['time'])
+print('** Date(s):')
 for i in f.variables['time']:
-    print('i =',i,'Date:',h2d(i))
+    #print('i =',i,'Date:',h2d(i))
+    if db: print('i =',i,end=' ')
+    print(h2d(i))
 
-#-- converting time, hours since 1900-01-01
-# time index, from zero to
-t_i = 0
 # this will count how many `time` tables are available:
 t_f = np.shape(f.variables['skt'])[0]
+
+#-- converting time, hours since 1900-01-01
+
+#-- This will convert the time value into a human readable form. The
+# time value will also be added to the output file name. Unique names
+# help with better understanding the output plots.
 hrs = f.variables['time'][t_i]
 t_date = h2d(hrs)
 plotname = plotname + str(t_date)
 
 #-- Knowing the dimensions, now we can recall useful data:
-var = f.variables['skt'][t_i,0,0,:,:]
+#var = f.variables['skt'][t_i,0,9,:,:]
+var = f.variables['skt'][t_i,0,:,:]
 lat = f.variables['latitude'][:]
 lon = f.variables['longitude'][:]
 
