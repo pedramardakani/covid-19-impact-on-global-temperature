@@ -25,104 +25,88 @@ def gettime(index):
     res = h2d(hrs)
     return res
 
+#-- convert data to float64 for numpy compatiblility
+### and get the product from scale factor
+def getdata(time):
+    var = f.variables['skt'][time,0,:,:]
+    var = var.astype('float64') # change to float64
+    sf = f.variables['skt'].attributes['scale_factor'] # check scale
+    var = var * np.array(sf) # scale the data
+    return var
+
 #-- get the difference between two dates
-#-- pay attention to argument placements
+### pay attention to argument placements
 def getdiff(t_f,t_i):
     # check if available (later)
-    return f.variables['skt'][t_f,0,:,:] - f.variables['skt'][t_i,0,:,:]
+    return getdata(t_f) - getdata(t_i)
 
 # === set variables  === #
 
 #-- set filename to read the data from
 filename = "data-comp.nc"
 plotname = "collage"
-plottype = "png"
-db = False # set debugging mode on or off
+plottype = "pdf"
 
 # === start calculations  === #
 
 #-- open file
 f   = nio.open_file(filename,'r')
 
-#-- start the graphics
-wks = ngl.open_wks(plottype,plotname)
-
-#-- resource settings
-res = ngl.Resources()
-res.nglFrame        = False
-res.cnFillOn        = True
-res.cnFillPalette   = "NCL_default"
-res.cnLineLabelsOn  = False
-res.lbOrientation   = "horizontal"
-res.sfXArray        = lon
-res.sfYArray        = lat
-
-#-- converting time, hours since 1900-01-01
-t_f = 6 # time index, from zero to
-t_i = 3 # difference
-plotname = plotname + str(gettime(t_f)) + " vs " + str(gettime(t_i))
-
-if db:
-    print('** filename:',filename)
-    print('** available variables:')
-    for vt in f.variables:
-        for at in f.variables[vt].attributes:
-            print("f.variables['",vt,"'].attributes['",at,"']",sep='')
-
-var = getdiff(t_f,t_i)
-lat = f.variables['latitude'][:]
-lon = f.variables['longitude'][:]
-
-if db:
-    print('** var size:', np.size(var))
-    print('** lat size:', np.size(lat))
-    print('** lon size:', np.size(lon))
-
-
-if db : print('** converting time:',hrs,'to Date:', gettime(t_i))
-
-#-- check how many datasets are available under different times
-print(np.size(f.variables['time'].attributes['calendar']))
-print(f.variables['time'].attributes['calendar'])
-print(f.variables['time'])
 for i in f.variables['time']:
     print('i =',i,'Date:',h2d(i))
 
-#-- Check the data type, if it's anything other than float64, numpy will complain
-if(var.dtype != 'float64'):
-    if db: print('** caution! current data type:','(',var.dtype,'), changing ...')
-    var = var.astype('float64')
-    if db and (var.dtype == 'float64'):
-        print('** success! new data type:',var.dtype)
+time3, time2, time1 = 6, 3, 0
+plottitle = plotname + str(gettime(time3)) + "vs" \
+    + str(gettime(time2)) + "vs" + str(gettime(time1))
 
-#-- Check if there are scale factors involved
-sf = f.variables['skt'].attributes['scale_factor']
-if(sf != None):
-    if db:
-        print('** scale factor detected:',sf)
-        print('** scale factor type:', type(sf))
-    var = var * np.array(sf)
+#-- start the graphics
+wks = ngl.open_wks(plottype,plottitle)
 
-#-- Check if there are offset values available
-os = f.variables['skt'].attributes['add_offset']
-if(os != None):
-    if db:
-        print('** offset value detected:',os)
-        print('** offset value:',type(os))
-    # === what should we do with the offset? === #
+lat = f.variables['latitude'][:]
+lon = f.variables['longitude'][:]
+
+#-- resource settings
+res = ngl.Resources()
+res.nglDraw         = False         # don't draw plots
+res.nglFrame        = False         # don't advance the frame
+res.cnFillOn        = True          # contour fill
+res.cnFillPalette   = "cmp_b2r"     # choose color map
+res.lbLabelBarOn    = False         # don't draw a label bar
+res.cnLineLabelsOn  = False         # no line labels
+res.sfXArray        = lon           # coords for x axis
+res.sfYArray        = lat           # coords for y axis
+
+#-- create the contour plots
+plot = []
+p = ngl.contour_map(wks,getdiff(time3,time2),res)
+plot.append(p)
+p = ngl.contour_map(wks,getdiff(time3,time1),res)
+plot.append(p)
+
+#-- panel resources
+pnlres = ngl.Resources()
+pnlres.nglFrame = False # don't advance the frame
+pnlres.nglPanelLabelBar = True # common label bar
+pnlres.txstring = str(plottitle) # panel title
+pnlres.txFontHeightF = 0.02 # text font size
+
+#-- create the panel plot
+ngl.panel(wks,plot[:],[2,1],pnlres)
 
 #-- Set the plot name
 plotname = f.variables['skt'].attributes['long_name'] + 'by Pedram, for Dear Saeed.'
 
-#-- create the contour plot
-plot = ngl.contour_map(wks,var,res)
-
-#-- write variable long name and units to the plot
+#-- add title string, long_name and units string to panel
+### horrible text placement, let's do it later!
+"""
 txres   = ngl.Resources()
-txres.txFontHeightF = 0.012
-ngl.text_ndc(wks, plotname + 'In degrees Celsius. Date: ' + str(gettime(t_f)) + " vs " + str(gettime(t_i)) , 0.50,0.82,txres)
+txres.txFontHeightF = 0.020
+ngl.text_ndc(wks, plottitle, 0.5, 0.825, txres)
 
+txres.txFontHeightF = 0.012
+ngl.text_ndc(wks, plotname+ 'In degrees Celsius. Date: ' + str(gettime(t_f)) + " vs " + str(gettime(t_i)) , 0.50,0.82,txres)
 # Hard coded this because of inconsistency in data structure: f.variables['skt'].attributes['units']
+"""
 ngl.frame(wks)
 
 ngl.end()
