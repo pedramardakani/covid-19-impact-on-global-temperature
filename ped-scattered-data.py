@@ -129,7 +129,7 @@ if db:
 
 #-- resource settings
 res = ngl.Resources()
-# res.nglDraw           = False #-- don't draw the plot yet
+#res.nglDraw         = False #-- don't draw the plot yet
 res.nglFrame        = False #-- don't advance the frame yet
 res.cnFillOn        = True  #-- turn on color fill
 if t_i == None:
@@ -149,7 +149,7 @@ res.cnLevelSelectionMode = "ManualLevels" #-- select manual levels
 res.cnMinLevelValF  = scalemin #-- minimum contour value
 res.cnMaxLevelValF  = scalemax #-- maximum contour value
 res.cnLevelSpacingF = scalestep #-- contour increment
-
+res.cnFillDrawOrder = "Predraw" #-- let the mask work!
 res.mpGridAndLimbOn = False
 
 res.lbBoxLinesOn    = False
@@ -158,6 +158,21 @@ res.lbLabelStride   = 10    #-- skip every other label
 res.lbLabelFontHeightF  = 0.009     #-- label bar font height
 res.lbBoxMinorExtentF   = 0.24      #-- decrease height of labelbar box
 res.lbOrientation   = "horizontal"  #-- horizontal labelbar
+
+#-- check if this works
+res.mpFillOn        = True
+res.mpAreaMaskingOn = True
+#res.mpOutlineBoundarySets = "National" #-- draw national borders
+#res.mpMaskAreaSpecifiers = ["water"]
+res.mpFillAreaSpecifiers = ["water"]
+res.mpSpecifiedFillColors= ["gray65"]
+
+#-- make a mask on the map
+res.mpLandFillColor = "Transparent"
+res.mpOceanFillColor= "gray50"
+#res.mpInLandWaterFillColor  = "Gray80"
+#res.mpOutlineOn = True
+#res.mpGeophysicalLineColor = "gray50"
 
 # res.tiMainString  = "Colors: temperature, Lines: ... "    #-- title string
 
@@ -183,6 +198,7 @@ plotname = f.variables['skt'].attributes['long_name'] + ' -PS- index ' + str(che
 
 #-- create the contour plot
 plot = ngl.contour_map(wks,var,res)
+
 
 #-- write variable long name and units to the plot
 txres   = ngl.Resources()
