@@ -1,5 +1,7 @@
 """
 30 Year mean from 1981 to 2010, Pedram.
+
+Get the mean.
 """
 
 #-- define a tic, toc function to check performance
@@ -48,6 +50,7 @@ def getdata(index):
 
 #t_f = 12 # time index, from zero to
 #t_i = 9 # difference
+
 #-- check if there are any data to take the difference of
 try:
     t_i = int(sys.argv[1])
@@ -63,7 +66,7 @@ scalestep = 2
 filename = "copernicus-era5-skt-30-years.grib"
 
 #-- set saved file name
-plotname = "30-years-"
+plotname = "diff-30YA-"
 plottype = "pdf"
 db = True # set debugging mode on or off
 
@@ -74,8 +77,10 @@ f   = nio.open_file(filename,'r')
 
 #-- check how many datasets are available under different times
 print(np.size(f.variables['initial_time0_hours']))
+count = -1
 for i in f.variables['initial_time0_hours']:
-    print('i =',i,'Date:',h2d(i))
+    count += 1
+    print('> Date: {2} | index: {0:3} | timestamp: {1}'.format(count,i,h2d(i)))
 
 #-- converting time, hours since 1900-01-01
 #-- check if there is a time difference available
