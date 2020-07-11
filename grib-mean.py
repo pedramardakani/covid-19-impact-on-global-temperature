@@ -102,15 +102,30 @@ if db:
 # TODO: remove this later, or change
 if t_i == None:
     t_i = 0
-var = getdata(t_i)
+
+#-- get the month
+print('>>> length:',len(f.variables['initial_time0_hours']))
+initmonth = 0 # 0:Jan - 1:Feb - 2:Mar - 3:Apr
+lastmonth = len(f.variables['initial_time0_hours'])
+monthstep = 4 # Steps to reach Jan 2000 to Jan 2001 with current data
+
+for thismonth in range(initmonth, lastmonth, monthstep):
+    if db: print(">>> This month: ",gettime(thismonth))
+
+print(np.zeros(36,18,dtype=float))
+
+#var = getdata(thismonth)
+
 lat = f.variables['g0_lat_1'][:]
 lon = f.variables['g0_lon_2'][:]
 
-if db:
-    print('** var size:', np.size(var))
-    print('** lat size:', np.size(lat))
-    print('** lon size:', np.size(lon))
 
+if db:
+    print('** var size:', np.size(var),'and shape',np.shape(var))
+    print('** lat size:', np.size(lat),'and shape',np.shape(lat))
+    print('** lon size:', np.size(lon),'and shape',np.shape(lon))
+
+"""
 #-- resource settings
 res = ngl.Resources()
 #res.nglDraw         = False #-- don't draw the plot yet
@@ -184,3 +199,4 @@ ngl.text_ndc(wks, plotname + '(C). Date: ' + str(gettime(t_i)), 0.50,0.82,txres)
 ngl.frame(wks)
 
 ngl.end()
+"""
