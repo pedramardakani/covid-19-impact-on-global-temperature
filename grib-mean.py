@@ -46,6 +46,31 @@ def getdata(index):
     var = var - 273.15
     return var
 
+#-- get data according to index
+def getmean(index):
+    # check which file to read
+    f   = nio.open_file(filename,'r')
+    
+    # get the data ready
+    # slicing: [start:end:step]
+    var = f.variables['SKT_GDS0_SFC_S123'][index::4,:,:]
+
+    #-- Check the data type, if it's anything other than float64, numpy will complain
+    if(var.dtype != 'float64'):
+        if db: print('--- caution! current data type:','(',var.dtype,'), changing ...')
+        var = var.astype('float64')
+        if db and (var.dtype == 'float64'):
+            print('>>> success! new data type:',var.dtype)
+        else:
+            raise ValueError('*** failed to change data type!')
+
+    # since the data is in K, convert to C
+    var = var - 273.15
+
+    # now, get the mean value
+    mean = np.mean(a = var, axis = 0)
+    return mean
+
 # === set variables  === #
 
 #t_f = 12 # time index, from zero to
@@ -60,6 +85,9 @@ except:
 scalemax = 50
 scalemin = -1 * scalemax
 scalestep = 2
+
+#-- make a tuple to get the month names according to the index
+months = ('January','February','March','April','May','June','July','August','September','October','November','December')
 
 #-- set filename to read the data from
 #-- the data is in absolute form, change it to relative if need be
@@ -77,16 +105,16 @@ f   = nio.open_file(filename,'r')
 
 #-- check how many datasets are available under different times
 print(np.size(f.variables['initial_time0_hours']))
-count = -1
+ndataset = -1
 for i in f.variables['initial_time0_hours']:
-    count += 1
-    print('> Date: {2} | index: {0:3} | timestamp: {1}'.format(count,i,h2d(i)))
+    ndataset += 1
+    print('> Date: {2} | index: {0:3} | timestamp: {1}'.format(ndataset,i,h2d(i)))
 
 #-- converting time, hours since 1900-01-01
 #-- check if there is a time difference available
     
 if t_i != None:
-    plotname = plotname + str(gettime(t_i))
+    plotname = plotname + str(months[t_i])
 else:
     plotname = plotname + "theDefault"
 
@@ -103,29 +131,18 @@ if db:
 if t_i == None:
     t_i = 0
 
-#-- get the month
-print('>>> length:',len(f.variables['initial_time0_hours']))
-initmonth = 0 # 0:Jan - 1:Feb - 2:Mar - 3:Apr
-lastmonth = len(f.variables['initial_time0_hours'])
-monthstep = 4 # Steps to reach Jan 2000 to Jan 2001 with current data
-
-for thismonth in range(initmonth, lastmonth, monthstep):
-    if db: print(">>> This month: ",gettime(thismonth))
-
-print(np.zeros(36,18,dtype=float))
-
-#var = getdata(thismonth)
-
 lat = f.variables['g0_lat_1'][:]
 lon = f.variables['g0_lon_2'][:]
 
+# get the 30 year mean here
+# 0: Jan, 1: Feb, 2: Mar, 3: Apr
+var = getmean(t_i)
 
 if db:
     print('** var size:', np.size(var),'and shape',np.shape(var))
     print('** lat size:', np.size(lat),'and shape',np.shape(lat))
     print('** lon size:', np.size(lon),'and shape',np.shape(lon))
 
-"""
 #-- resource settings
 res = ngl.Resources()
 #res.nglDraw         = False #-- don't draw the plot yet
@@ -193,10 +210,9 @@ txres   = ngl.Resources()
 txres.txFontHeightF = 0.012
 
 #-- name the plot
-ngl.text_ndc(wks, plotname + '(C). Date: ' + str(gettime(t_i)), 0.50,0.82,txres)
+ngl.text_ndc(wks, plotname + '(C). Date: ' + str(months[t_i]), 0.50,0.82,txres)
 
 # Hard coded this because of inconsistency in data structure: f.variables['skt'].attributes['units']
 ngl.frame(wks)
 
 ngl.end()
-"""
