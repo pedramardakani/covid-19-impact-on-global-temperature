@@ -36,7 +36,7 @@ def h2d(hrs,netcdf = False):
     # Set to true or false accordingly
     if netcdf:
         # The NetCDF files start from 1900
-        tstart = datetime.date(1800,1,1)
+        tstart = datetime.date(1900,1,1)
     else:
         # The GRIB files start from 1800
         tstart = datetime.date(1800,1,1)
