@@ -27,10 +27,10 @@ def gettime(index):
 # === set variables  === #
 
 #-- set filename to read the data from
-filename = "data-comp-1.nc"
-plotname = "test-1"
+filename = "data-2020.nc"
+plotname = "validity-check"
 plottype = "png"
-db = False # set debugging mode on or off
+db = True # set debugging mode on or off
 
 # === start calculations  === #
 
