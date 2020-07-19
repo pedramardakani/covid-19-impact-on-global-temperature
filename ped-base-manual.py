@@ -9,6 +9,7 @@ import numpy as np
 import Ngl as ngl
 import Nio as nio
 import datetime
+import sys
 
 # === define functions === #
 
@@ -26,7 +27,7 @@ def gettime(index):
     return res
 # === set variables  === #
 
-check_index = 0
+check_index = int(sys.argv[1])
 
 #-- set filename to read the data from
 # filename = "adaptor.mars.internal-1587995993.0181034-27757-13-25eca862-11d8-4ecf-97d5-80fe4f17c987.nc"
@@ -51,7 +52,7 @@ for i in f.variables['time']:
     print('i =',i,'Date:',h2d(i))
 
 #-- converting time, hours since 1900-01-01
-t_f = 17 # time index, from zero to
+t_f = 12 # time index, from zero to
 t_i = 9 # difference
 plotname = plotname + str(gettime(t_f)) # + " vs " + str(gettime(t_i))
 
