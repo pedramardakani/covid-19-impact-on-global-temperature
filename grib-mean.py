@@ -2,6 +2,8 @@
 30 Year mean from 1981 to 2010, Pedram.
 
 Get the mean.
+
+Calculate the difference.
 """
 
 #-- define a tic, toc function to check performance
@@ -15,17 +17,25 @@ import sys
 
 # === define functions === #
 
-#-- convert time, hours since 1800-01-01
-def h2d(hrs):
-    tstart = datetime.date(1800,1,1) # Note the change! The grib files start from 1800 instead of 1900
+#-- convert time, hours since 1800 or 1900
+def h2d(hrs,netcdf=false):
+    # The file is assumed to be GRIB by default
+    # Set to true or false accordingly
+    if netcdf:
+        # The NetCDF files start from 1900
+        tstart = datetime.date(1800,1,1)
+    else:
+        # The GRIB files start from 1800
+        tstart = datetime.date(1800,1,1)
+
     tdelta = datetime.timedelta(hours=float(hrs))
     res = tstart + tdelta
     return res
 
 #-- get time straight from data table
-def gettime(index):
+def gettime(index,netcdf=false):
     hrs = f.variables['initial_time0_hours'][index]
-    res = h2d(hrs)
+    res = h2d(hrs,netcdf)
     return res
 
 #-- get data according to index
