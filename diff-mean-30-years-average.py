@@ -19,9 +19,8 @@ import Nio as nio
 # to understand and change various date formats
 import datetime
 
-# need functions from xarray and xesmf for regridding
-import xarray as xr
-import xesmf as xe
+# need functions for interpolation and regridding
+import scipy.interpolate as interp
 
 # To provide the program with variables using the commandline. This is
 # for faster calculations with automated functions through bash.
@@ -41,6 +40,8 @@ def h2d(hrs,netcdf = False):
         # The GRIB files start from 1800
         tstart = datetime.date(1800,1,1)
 
+    if db: print('hrs =',hrs)
+    print(type(hrs))
     tdelta = datetime.timedelta(hours=float(hrs))
     res = tstart + tdelta
     return res
@@ -56,7 +57,6 @@ def getdata(index):
     # check which file to read
     filename = 'copernicus-era5-skt-2020.grib'
     f   = nio.open_file(filename,'r')
-    
     # get the data ready
     var = f.variables['SKT_GDS0_SFC_S123'][index,:,:]
 
@@ -123,7 +123,7 @@ months = ('January','February','March','April','May','June','July','August','Sep
 filename = "copernicus-era5-skt-2020.grib"
 
 #-- set saved file name
-plotname = "ped-diff-to-30-year-average-"
+plotname = "ped-30-year-average-regrid-"
 plottype = "pdf"
 db = True # set debugging mode on or off
 
@@ -131,13 +131,15 @@ db = True # set debugging mode on or off
 
 #-- open file and dicover variables
 f   = nio.open_file(filename,'r')
+#f = xr.open_dataset(filename)
 
 #-- check how many datasets are available under different times
 print(np.size(f.variables['initial_time0_hours']))
 ndataset = -1
 for i in f.variables['initial_time0_hours']:
     ndataset += 1
-    print('> Date: {2} | index: {0:3} | timestamp: {1}'.format(ndataset,i,h2d(i)))
+    if db: print('i =',i)
+    print('> Date: {} | index: {} | timestamp: {}'.format(i,ndataset,h2d(i)))
 
 #-- converting time, hours since 1900-01-01
 #-- check if there is a time difference available
@@ -160,12 +162,20 @@ if db:
 if t_i == None:
     t_i = 0
 
+# let's test the natgrid
+
 lat = f.variables['g0_lat_1'][:]
 lon = f.variables['g0_lon_2'][:]
+
+dst_lat = np.arange(-90,90,0.1)
+dst_lon = np.arange(0,359.9,0.1)
 
 # get the 30 year mean here
 # 0: Jan, 1: Feb, 2: Mar, 3: Apr
 var = getdata(t_i) #- getmean(t_i)
+
+# the new regridded var
+var = ngl.natgrid(lat,lon,var,dst_lat,dst_lon)
 
 if db:
     print('** var size:', np.size(var),'and shape',np.shape(var))
