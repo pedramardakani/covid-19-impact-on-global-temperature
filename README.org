@@ -1,0 +1,26 @@
+* Set-up the CDS API
+
+  First, you need to get your personal API key from the Copernicus website
+  as instructed [[https://cds.climate.copernicus.eu/api-how-to][here]].
+
+* Install the CDS API python package
+
+  #+BEGIN_EXAMPLE bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  python3 -m pip install requirements.txt
+  #+END_EXAMPLE
+
+* Download the data
+
+  Check the =dataset-api-request.py= file and set it up as you need. For
+  example, in this file, we get the data from 1985 up until now.
+
+  If everything is just as you need, execute the file with:
+
+  #+BEGIN_EXAMPLE bash
+  source .venv/bin/activate
+  python3 dataset-api-request.py
+  #+END_EXAMPLE
+
+  Now wait for the download to finish.
