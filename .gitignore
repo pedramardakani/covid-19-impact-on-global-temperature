@@ -1,4 +1,10 @@
+# Ignore System Files
+*~
+*#
+*.nc
+.venv
+
+# Ignore Outputs
 *.pdf
 *.png
-*.nc
 *.tar.gz
