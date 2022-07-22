@@ -1,3 +1,45 @@
+* Introduction
+
+  This repository is a part of the paper ``Impacts on Global Temperature
+  During the First Part of 2020 Due to the Reduction in Human Activities by
+  COVID-19'' with *DOI* [[https://doi.org/10.1177/11786221221101901][10.1177/11786221221101901]].
+
+  Shojaei, S., Ashofteh, P., Dwijendra, N. K. A., Melesse, A. M.,
+  Shahvaran, A. R., Shojaei, S., & Homayoonnezhad, I. (2022). Impacts on
+  Global Temperature During the First Part of 2020 Due to the Reduction in
+  Human Activities by COVID-19. Air, Soil and Water
+  Research. https://doi.org/10.1177/11786221221101901
+
+  The dataset is downloaded from the [[https://cds.climate.copernicus.eu/][Copernicus website]]:
+
+  Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz
+  Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D.,
+  Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2019): ERA5 monthly
+  averaged data on single levels from 1959 to present. Copernicus Climate
+  Change Service (C3S) Climate Data Store (CDS). (Accessed on 22-07-2022),
+  [[https://doi.org/10.24381/cds.f17050d7][10.24381/cds.f17050d7]]
+
+* License
+
+  Original author:
+      Pedram Ashofteh Ardakani <pedramardakani@pm.me>
+  Contributing author(s):
+      Saeed Shojaei
+  Copyright (C) 2019-2022 Free Software Foundation, Inc.
+
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
+
+  This software is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+  Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this software. If not, see <http://www.gnu.org/licenses/>.
+
 * Set-up the CDS API
 
   First, you need to get your personal API key from the Copernicus website
